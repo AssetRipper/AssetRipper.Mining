@@ -7,7 +7,7 @@ using AdditionalFieldArray = System.Collections.Immutable.ImmutableArray<System.
 
 namespace AssetRipper.Mining.EngineAssets;
 
-public static class Program
+internal static class Program
 {
 	private const string DefaultResourcesName = "unity default resources";
 	private const string ExtraResourcesName = "unity_builtin_extra";
@@ -25,8 +25,7 @@ public static class Program
 		{
 			Console.WriteLine($"{typeID,4} : {count,3}");
 		}
-		File.WriteAllText("default.json", JsonSerializer.Serialize(defaultDictionary, DictionarySerializerContext.Default.DictionaryInt64AssetInfo));
-		File.WriteAllText("extra.json", JsonSerializer.Serialize(extraDictionary, DictionarySerializerContext.Default.DictionaryInt64AssetInfo));
+		File.WriteAllText("engineassets.json", new EngineAssetsData(defaultDictionary, extraDictionary).ToJson());
 		Console.WriteLine("Done!");
 	}
 

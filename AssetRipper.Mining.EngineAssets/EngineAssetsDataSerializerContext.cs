@@ -3,7 +3,7 @@
 namespace AssetRipper.Mining.EngineAssets;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(Dictionary<long, AssetInfo>))]
-internal sealed partial class DictionarySerializerContext : JsonSerializerContext
+[JsonSerializable(typeof(EngineAssetsData))]
+internal sealed partial class EngineAssetsDataSerializerContext : JsonSerializerContext
 {
 }
