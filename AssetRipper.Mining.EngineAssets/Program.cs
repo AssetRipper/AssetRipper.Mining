@@ -13,8 +13,8 @@ internal static class Program
 	public static void Main(string[] args)
 	{
 		string unityFolderPath = args[0];
-		Dictionary<long, AssetInfo> defaultDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, DefaultResourcesName));
-		Dictionary<long, AssetInfo> extraDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, ExtraResourcesName));
+		Dictionary<long, Object> defaultDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, DefaultResourcesName));
+		Dictionary<long, Object> extraDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, ExtraResourcesName));
 		Dictionary<int, int> typeIDs = defaultDictionary.Values.Union(extraDictionary.Values)
 			.Select(a => a.TypeID).Distinct().Order()
 			.ToDictionary(id => id, id => defaultDictionary.Values.Union(extraDictionary.Values).Count(a => a.TypeID == id));
@@ -26,7 +26,7 @@ internal static class Program
 		Console.WriteLine("Done!");
 	}
 
-	private static Dictionary<long, AssetInfo> ReadDictionary(string path)
+	private static Dictionary<long, Object> ReadDictionary(string path)
 	{
 		return LoadAllAssetInfo(path).OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
 	}
@@ -41,84 +41,108 @@ internal static class Program
 		}
 	}
 
-	private static IEnumerable<KeyValuePair<long, AssetInfo>> LoadAllAssetInfo(string path)
+	private static IEnumerable<KeyValuePair<long, Object>> LoadAllAssetInfo(string path)
 	{
 		foreach (UnityAsset asset in LoadAllAssets(path))
 		{
-			AssetInfo assetInfo;
+			Object obj;
 			switch (asset.TypeID)
 			{
 				case 21://Material
 					{
-						UnityAsset shader = asset.GetAsset("m_Shader");
-						KeyValuePair<string, string>[] primitiveFields = new[] { new KeyValuePair<string, string>("Shader", shader.Name) };
-						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
+						obj = new Material()
+						{
+							Name = asset.Name,
+							Shader = asset.TryGetAsset("m_Shader")?.Name
+						};
 					}
 					break;
 				case 28://Texture2D
 					{
-						KeyValuePair<string, string>[] primitiveFields = new[]
+						obj = new Texture2D()
 						{
-							new KeyValuePair<string, string>("Height", asset.GetString("m_Height")),
-							new KeyValuePair<string, string>("Width", asset.GetString("m_Width"))
+							Name = asset.Name,
+							Height = asset.GetInt32("m_Height"),
+							Width = asset.GetInt32("m_Width")
 						};
-						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 43://Mesh
 					{
-						AssetTypeValueField vertexData = asset.GetBaseField().Get("m_VertexData");
-						uint vertexCount = vertexData.IsDummy ? default : vertexData.Get("m_VertexCount").AsUInt;
-						KeyValuePair<string, string>[] primitiveFields = new[] { new KeyValuePair<string, string>("VertexCount", vertexCount.ToString()) };
-						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
+						obj = new Mesh()
+						{
+							Name = asset.Name,
+							VertexCount = asset.GetBaseField().Get("m_VertexData").Get("m_VertexCount").AsUInt
+						};
 					}
 					break;
 				case 48://Shader
 					{
+						string[] propertyNames;
 						AssetTypeValueField serializedShader = asset.GetBaseField().Get("m_ParsedForm");
 						if (serializedShader.IsDummy)
 						{
-							goto default;
+							propertyNames = Array.Empty<string>();
 						}
 						else
 						{
 							List<AssetTypeValueField> propsList = serializedShader.Get("m_PropInfo").Get("m_Props").Get("Array").Children;
-							string[] propertyNames = propsList.Count == 0 ? Array.Empty<string>() : new string[propsList.Count];
-							for (int i = 0; i < propsList.Count; i++)
+							if (propsList.Count == 0)
 							{
-								propertyNames[i] = propsList[i].Get("m_Name").AsString ?? "";
+								propertyNames = Array.Empty<string>();
 							}
-							KeyValuePair<string, string[]>[] arrayFields = new[]
+							else
 							{
-								new KeyValuePair<string, string[]>("PropertyNames", propertyNames)
-							};
-							assetInfo = new AssetInfo(asset.TypeID, asset.Name, Array.Empty<KeyValuePair<string, string>>(), arrayFields);
+								propertyNames = new string[propsList.Count];
+								for (int i = 0; i < propsList.Count; i++)
+								{
+									propertyNames[i] = propsList[i].Get("m_Name").AsString ?? "";
+								}
+							}
 						}
+
+						obj = new Shader()
+						{
+							Name = asset.Name,
+							PropertyNames = propertyNames
+						};
 					}
 					break;
 				case 72://ComputeShader
 					goto default;
+				case 89://Cubemap
+					{
+						obj = new Cubemap()
+						{
+							Name = asset.Name,
+							Height = asset.GetInt32("m_Height"),
+							Width = asset.GetInt32("m_Width")
+						};
+					}
+					break;
 				case 114://MonoBehaviour
 					{
-						UnityAsset script = asset.GetAsset("m_Script");
-						KeyValuePair<string, string>[] primitiveFields = new[]
+						UnityAsset? script = asset.TryGetAsset("m_Script");
+						obj = new MonoBehaviour()
 						{
-							new KeyValuePair<string, string>("AssemblyName", script.GetString("m_AssemblyName")),
-							new KeyValuePair<string, string>("Namespace", script.GetString("m_Namespace")),
-							new KeyValuePair<string, string>("ClassName", script.GetString("m_ClassName"))
+							Name = asset.Name,
+							AssemblyName = script?.GetString("m_AssemblyName") ?? "",
+							Namespace = script?.GetString("m_Namespace") ?? "",
+							ClassName = script?.GetString("m_ClassName") ?? "",
+							GameObject = asset.TryGetAsset("m_GameObject")?.Name,
+							Enabled = asset.GetBoolean("m_Enabled")
 						};
-						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 115://MonoScript
 					{
-						KeyValuePair<string, string>[] primitiveFields = new[]
+						obj = new MonoScript()
 						{
-							new KeyValuePair<string, string>("AssemblyName", asset.GetString("m_AssemblyName")),
-							new KeyValuePair<string, string>("Namespace", asset.GetString("m_Namespace")),
-							new KeyValuePair<string, string>("ClassName", asset.GetString("m_ClassName"))
+							Name = asset.Name,
+							AssemblyName = asset.GetString("m_AssemblyName"),
+							Namespace = asset.GetString("m_Namespace"),
+							ClassName = asset.GetString("m_ClassName")
 						};
-						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 128://Font
@@ -128,10 +152,14 @@ internal static class Program
 				case 1113://LightmapParameters
 					goto default;
 				default:
-					assetInfo = new AssetInfo(asset.TypeID, asset.Name);
+					obj = new GenericNamedObject()
+					{
+						TypeID = asset.TypeID,
+						Name = asset.Name
+					};
 					break;
 			}
-			yield return new KeyValuePair<long, AssetInfo>(asset.PathID, assetInfo);
+			yield return new KeyValuePair<long, Object>(asset.PathID, obj);
 		}
 	}
 
@@ -169,10 +197,21 @@ internal static class Program
 
 		public string GetString(string fieldName) => GetBaseField().Get(fieldName).AsString ?? "";
 
-		public UnityAsset GetAsset(string fieldName)
+		public int GetInt32(string fieldName) => GetBaseField().Get(fieldName).AsInt;
+
+		public bool GetBoolean(string fieldName) => GetBaseField().Get(fieldName).AsBool;
+
+		public UnityAsset? TryGetAsset(string fieldName)
 		{
-			AssetExternal assetExternal = manager.GetExtAsset(file, GetBaseField().Get(fieldName));
-			return new UnityAsset(manager, assetExternal.file, assetExternal.info);
+			return ResolveAsset(GetBaseField().Get(fieldName));
+		}
+
+		public UnityAsset? ResolveAsset(AssetTypeValueField pptrField)
+		{
+			AssetExternal assetExternal = manager.GetExtAsset(file, pptrField);
+			return assetExternal.file is null || assetExternal.info is null
+				? null
+				: new UnityAsset(manager, assetExternal.file, assetExternal.info);
 		}
 
 		public AssetTypeValueField GetBaseField() => manager.GetBaseField(file, info);

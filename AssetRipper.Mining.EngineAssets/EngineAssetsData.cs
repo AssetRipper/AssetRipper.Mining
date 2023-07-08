@@ -2,7 +2,7 @@
 
 namespace AssetRipper.Mining.EngineAssets;
 
-public record struct EngineAssetsData(Dictionary<long, AssetInfo> DefaultResources, Dictionary<long, AssetInfo> ExtraResources)
+public partial record struct EngineAssetsData(Dictionary<long, Object> DefaultResources, Dictionary<long, Object> ExtraResources)
 {
 	public EngineAssetsData() : this(new(), new())
 	{
