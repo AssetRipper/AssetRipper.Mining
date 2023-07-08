@@ -14,6 +14,7 @@ namespace AssetRipper.Mining.EngineAssets;
 [JsonDerivedType(typeof(MonoBehaviour), nameof(MonoBehaviour))]
 [JsonDerivedType(typeof(MonoScript), nameof(MonoScript))]
 [JsonDerivedType(typeof(Shader), nameof(Shader))]
+[JsonDerivedType(typeof(Sprite), nameof(Sprite))]
 [JsonDerivedType(typeof(TextAsset), nameof(TextAsset))]
 [JsonDerivedType(typeof(Texture2D), nameof(Texture2D))]
 public abstract record class Object

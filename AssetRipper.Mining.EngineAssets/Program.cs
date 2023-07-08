@@ -148,7 +148,14 @@ internal static class Program
 				case 128://Font
 					goto default;
 				case 213://Sprite
-					goto default;
+					{
+						obj = new Sprite()
+						{
+							Name = asset.Name,
+							Texture = asset.ResolveAsset(asset.GetBaseField().Get("m_RD").Get("texture"))?.Name,
+						};
+					}
+					break;
 				case 1113://LightmapParameters
 					goto default;
 				default:
