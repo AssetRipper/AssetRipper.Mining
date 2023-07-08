@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "AssetRipper.Mining.EngineAssets": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:/Program Files/Unity\\Hub/Editor/2022.2.1f1/\""
-    }
-  }
-}
