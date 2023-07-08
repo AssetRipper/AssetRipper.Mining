@@ -1,9 +1,6 @@
 ﻿using AssetsTools.NET;
 using AssetsTools.NET.Extra;
-using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Text.Json;
-using AdditionalFieldArray = System.Collections.Immutable.ImmutableArray<System.Collections.Generic.KeyValuePair<string, string>>;
 
 namespace AssetRipper.Mining.EngineAssets;
 
@@ -48,27 +45,32 @@ internal static class Program
 	{
 		foreach (UnityAsset asset in LoadAllAssets(path))
 		{
-			AdditionalFieldArray additionalFields;
+			AssetInfo assetInfo;
 			switch (asset.TypeID)
 			{
 				case 21://Material
 					{
 						UnityAsset shader = asset.GetAsset("m_Shader");
-						additionalFields = ImmutableArray.Create(new KeyValuePair<string, string>("Shader", shader.Name));
+						KeyValuePair<string, string>[] primitiveFields = new[] { new KeyValuePair<string, string>("Shader", shader.Name) };
+						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 28://Texture2D
 					{
-						additionalFields = ImmutableArray.Create(
+						KeyValuePair<string, string>[] primitiveFields = new[]
+						{
 							new KeyValuePair<string, string>("Height", asset.GetString("m_Height")),
-							new KeyValuePair<string, string>("Width", asset.GetString("m_Width")));
+							new KeyValuePair<string, string>("Width", asset.GetString("m_Width"))
+						};
+						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 43://Mesh
 					{
 						AssetTypeValueField vertexData = asset.GetBaseField().Get("m_VertexData");
 						uint vertexCount = vertexData.IsDummy ? default : vertexData.Get("m_VertexCount").AsUInt;
-						additionalFields = ImmutableArray.Create(new KeyValuePair<string, string>("VertexCount", vertexCount.ToString()));
+						KeyValuePair<string, string>[] primitiveFields = new[] { new KeyValuePair<string, string>("VertexCount", vertexCount.ToString()) };
+						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 48://Shader
@@ -80,14 +82,17 @@ internal static class Program
 						}
 						else
 						{
-							AdditionalFieldArray.Builder builder = ImmutableArray.CreateBuilder<KeyValuePair<string, string>>();
 							List<AssetTypeValueField> propsList = serializedShader.Get("m_PropInfo").Get("m_Props").Get("Array").Children;
+							string[] propertyNames = propsList.Count == 0 ? Array.Empty<string>() : new string[propsList.Count];
 							for (int i = 0; i < propsList.Count; i++)
 							{
-								string propertyName = propsList[i].Get("m_Name").AsString ?? "";
-								builder.Add(new KeyValuePair<string, string>($"Property{i}_Name", propertyName));
+								propertyNames[i] = propsList[i].Get("m_Name").AsString ?? "";
 							}
-							additionalFields = builder.ToImmutable();
+							KeyValuePair<string, string[]>[] arrayFields = new[]
+							{
+								new KeyValuePair<string, string[]>("PropertyNames", propertyNames)
+							};
+							assetInfo = new AssetInfo(asset.TypeID, asset.Name, Array.Empty<KeyValuePair<string, string>>(), arrayFields);
 						}
 					}
 					break;
@@ -96,18 +101,24 @@ internal static class Program
 				case 114://MonoBehaviour
 					{
 						UnityAsset script = asset.GetAsset("m_Script");
-						additionalFields = ImmutableArray.Create(
+						KeyValuePair<string, string>[] primitiveFields = new[]
+						{
 							new KeyValuePair<string, string>("AssemblyName", script.GetString("m_AssemblyName")),
 							new KeyValuePair<string, string>("Namespace", script.GetString("m_Namespace")),
-							new KeyValuePair<string, string>("ClassName", script.GetString("m_ClassName")));
+							new KeyValuePair<string, string>("ClassName", script.GetString("m_ClassName"))
+						};
+						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 115://MonoScript
 					{
-						additionalFields = ImmutableArray.Create(
+						KeyValuePair<string, string>[] primitiveFields = new[]
+						{
 							new KeyValuePair<string, string>("AssemblyName", asset.GetString("m_AssemblyName")),
 							new KeyValuePair<string, string>("Namespace", asset.GetString("m_Namespace")),
-							new KeyValuePair<string, string>("ClassName", asset.GetString("m_ClassName")));
+							new KeyValuePair<string, string>("ClassName", asset.GetString("m_ClassName"))
+						};
+						assetInfo = new AssetInfo(asset.TypeID, asset.Name, primitiveFields);
 					}
 					break;
 				case 128://Font
@@ -117,10 +128,10 @@ internal static class Program
 				case 1113://LightmapParameters
 					goto default;
 				default:
-					additionalFields = AdditionalFieldArray.Empty;
+					assetInfo = new AssetInfo(asset.TypeID, asset.Name);
 					break;
 			}
-			yield return new KeyValuePair<long, AssetInfo>(asset.PathID, new AssetInfo(asset.TypeID, asset.Name, additionalFields));
+			yield return new KeyValuePair<long, AssetInfo>(asset.PathID, assetInfo);
 		}
 	}
 
