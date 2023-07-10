@@ -146,7 +146,6 @@ internal static class Program
 					{
 						obj = new MonoScript()
 						{
-							Name = asset.Name,
 							AssemblyName = asset.GetString("m_AssemblyName"),
 							Namespace = asset.GetString("m_Namespace"),
 							ClassName = asset.GetString("m_ClassName")
