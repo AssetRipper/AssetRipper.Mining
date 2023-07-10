@@ -1,18 +1,9 @@
-﻿using System.Text.Json.Serialization;
-
-namespace AssetRipper.Mining.PredefinedAssets;
+﻿namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class MonoBehaviour : Behaviour
 {
-	public string Name { get; set; } = "";
-	public string AssemblyName { get; set; } = "";
-	public string Namespace { get; set; } = "";
-	public string ClassName { get; set; } = "";
-
-	[JsonIgnore]
-	public override int TypeID
-	{
-		get => 114;
-		set { }
-	}
+	public required string Name { get; init; }
+	public required string AssemblyName { get; init; }
+	public required string Namespace { get; init; }
+	public required string ClassName { get; init; }
 }

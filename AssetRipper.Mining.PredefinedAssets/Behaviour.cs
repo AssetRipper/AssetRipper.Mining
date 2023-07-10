@@ -2,5 +2,5 @@
 
 public abstract record class Behaviour : Component
 {
-	public bool Enabled { get; set; }
+	public required bool Enabled { get; init; }
 }

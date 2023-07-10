@@ -5,5 +5,5 @@ namespace AssetRipper.Mining.PredefinedAssets;
 public sealed record class GenericNamedObject : NamedObject
 {
 	[JsonInclude]
-	public override int TypeID { get; set; }
+	public new required int TypeID { get; init; }
 }

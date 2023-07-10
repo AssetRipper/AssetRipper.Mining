@@ -4,12 +4,5 @@ namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class Material : NamedObject
 {
-	public string? Shader { get; set; }
-
-	[JsonIgnore]
-	public override int TypeID
-	{
-		get => 21;
-		set { }
-	}
+	public required string? Shader { get; init; }
 }

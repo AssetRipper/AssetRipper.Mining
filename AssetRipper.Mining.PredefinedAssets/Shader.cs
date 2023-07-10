@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 
 namespace AssetRipper.Mining.PredefinedAssets;
 
@@ -8,22 +7,15 @@ public sealed record class Shader : NamedObject
 	/// <summary>
 	/// 5.5.0 to Max
 	/// </summary>
-	public string[] PropertyNames { get; set; } = Array.Empty<string>();
+	public required string[] PropertyNames { get; init; }
 
 	public bool Equals([NotNullWhen(true)] Shader? other)
 	{
-		return Equals((NamedObject?)other) && PropertyNames.AsSpan().SequenceEqual(other.PropertyNames);
+		return other is not null && Name == other.Name && PropertyNames.AsSpan().SequenceEqual(other.PropertyNames);
 	}
 
 	public override int GetHashCode()
 	{
-		return HashCode.Combine(base.GetHashCode(), PropertyNames.Length);
-	}
-
-	[JsonIgnore]
-	public override int TypeID
-	{
-		get => 48;
-		set { }
+		return HashCode.Combine(Name, PropertyNames.Length);
 	}
 }

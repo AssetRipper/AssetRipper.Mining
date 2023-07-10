@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace AssetRipper.Mining.PredefinedAssets;
+﻿namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class AudioClip : NamedObject
 {
@@ -8,22 +6,17 @@ public sealed record class AudioClip : NamedObject
 	/// The number of channels in the audio clip.<br />
 	/// 5.0.0 to Max
 	/// </summary>
-	public int Channels { get; set; }
+	public required int Channels { get; init; }
+
 	/// <summary>
 	/// The sample frequency of the clip in Hertz.<br />
 	/// 5.0.0 to Max
 	/// </summary>
-	public int Frequency { get; set; }
+	public required int Frequency { get; init; }
+
 	/// <summary>
 	/// The length of the audio clip in seconds.<br />
 	/// 5.0.0 to Max
 	/// </summary>
-	public float Length { get; set; }
-
-	[JsonIgnore]
-	public override int TypeID
-	{
-		get => 83;
-		set { }
-	}
+	public required float Length { get; init; }
 }

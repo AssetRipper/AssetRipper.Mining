@@ -1,15 +1,6 @@
-﻿using System.Text.Json.Serialization;
-
-namespace AssetRipper.Mining.PredefinedAssets;
+﻿namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class Mesh : NamedObject
 {
-	public uint VertexCount { get; set; }
-
-	[JsonIgnore]
-	public override int TypeID
-	{
-		get => 43;
-		set { }
-	}
+	public required uint VertexCount { get; init; }
 }

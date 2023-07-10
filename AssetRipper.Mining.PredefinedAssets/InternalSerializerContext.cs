@@ -6,8 +6,4 @@ namespace AssetRipper.Mining.PredefinedAssets;
 [JsonSerializable(typeof(EngineFileData))]
 internal sealed partial class InternalSerializerContext : JsonSerializerContext
 {
-	public static InternalSerializerContext Get()
-	{
-		return Default;
-	}
 }
