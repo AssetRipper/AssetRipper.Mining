@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace AssetRipper.Mining.EngineAssets;
+namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class Shader : NamedObject
 {

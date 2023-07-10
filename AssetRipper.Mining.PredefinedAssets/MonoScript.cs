@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AssetRipper.Mining.EngineAssets;
+namespace AssetRipper.Mining.PredefinedAssets;
 
-public sealed record class MonoBehaviour : Behaviour
+public sealed record class MonoScript : NamedObject
 {
-	public string Name { get; set; } = "";
 	public string AssemblyName { get; set; } = "";
 	public string Namespace { get; set; } = "";
 	public string ClassName { get; set; } = "";
@@ -12,7 +11,7 @@ public sealed record class MonoBehaviour : Behaviour
 	[JsonIgnore]
 	public override int TypeID
 	{
-		get => 114;
+		get => 115;
 		set { }
 	}
 }

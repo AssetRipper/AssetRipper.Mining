@@ -11,4 +11,8 @@
 		<PackageReference Include="AssetsTools.NET" Version="3.0.0-preview3" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\AssetRipper.Mining.PredefinedAssets\AssetRipper.Mining.PredefinedAssets.csproj" />
+	</ItemGroup>
+
 </Project>

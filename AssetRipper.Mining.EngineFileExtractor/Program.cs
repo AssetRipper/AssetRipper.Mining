@@ -1,8 +1,10 @@
-﻿using AssetsTools.NET;
+﻿using AssetRipper.Mining.PredefinedAssets;
+using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 using System.Diagnostics;
+using Object = AssetRipper.Mining.PredefinedAssets.Object;
 
-namespace AssetRipper.Mining.EngineAssets;
+namespace AssetRipper.Mining.EngineFileExtractor;
 
 internal static class Program
 {
@@ -22,7 +24,7 @@ internal static class Program
 		{
 			Console.WriteLine($"{typeID,4} : {count,3}");
 		}
-		File.WriteAllText("engineassets.json", new EngineAssetsData(defaultDictionary, extraDictionary).ToJson());
+		File.WriteAllText("engineassets.json", new EngineFileData(defaultDictionary, extraDictionary).ToJson());
 		Console.WriteLine("Done!");
 	}
 

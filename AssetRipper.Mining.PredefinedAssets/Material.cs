@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AssetRipper.Mining.EngineAssets;
+namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class Material : NamedObject
 {
