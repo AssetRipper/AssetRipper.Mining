@@ -3,7 +3,8 @@
 namespace AssetRipper.Mining.PredefinedAssets;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(EngineFileData))]
+[JsonSerializable(typeof(EngineResourceData))]
+[JsonSerializable(typeof(UnityPackageData))]
 internal sealed partial class InternalSerializerContext : JsonSerializerContext
 {
 }

@@ -1,4 +1,5 @@
 ﻿using AssetRipper.Mining.PredefinedAssets;
+using AssetRipper.Primitives;
 using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 using System.Diagnostics;
@@ -30,7 +31,7 @@ internal static class Program
 			}
 		}
 
-		File.WriteAllText("engineassets.json", new EngineFileData(defaultDictionary, extraDictionary).ToJson());
+		File.WriteAllText("engineassets.json", new EngineResourceData(defaultDictionary, extraDictionary).ToJson());
 		Console.WriteLine("Done!");
 	}
 
