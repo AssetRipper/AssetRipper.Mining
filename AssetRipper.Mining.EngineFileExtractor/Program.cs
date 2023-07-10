@@ -17,13 +17,19 @@ internal static class Program
 		string unityFolderPath = args[0];
 		Dictionary<long, Object> defaultDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, DefaultResourcesName));
 		Dictionary<long, Object> extraDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, ExtraResourcesName));
-		Dictionary<int, int> typeIDs = defaultDictionary.Values.Union(extraDictionary.Values)
-			.Select(a => a.TypeID).Distinct().Order()
-			.ToDictionary(id => id, id => defaultDictionary.Values.Union(extraDictionary.Values).Count(a => a.TypeID == id));
-		foreach ((int typeID, int count) in typeIDs)
+
+		foreach ((string name, Dictionary<long, Object> dictionary) in new[]{ ("Default", defaultDictionary), ("Extra", extraDictionary) })
 		{
-			Console.WriteLine($"{typeID,4} : {count,3}");
+			Dictionary<int, int> typeIDs = dictionary.Values
+				.Select(a => a.TypeID).Distinct().Order()
+				.ToDictionary(id => id, id => dictionary.Values.Count(a => a.TypeID == id));
+			Console.WriteLine(name);
+			foreach ((int typeID, int count) in typeIDs)
+			{
+				Console.WriteLine($"\t{typeID,4} : {count,3}");
+			}
 		}
+
 		File.WriteAllText("engineassets.json", new EngineFileData(defaultDictionary, extraDictionary).ToJson());
 		Console.WriteLine("Done!");
 	}
@@ -195,7 +201,8 @@ internal static class Program
 			get
 			{
 				AssetTypeValueField baseField = GetBaseField();
-				string? name = baseField.Get("m_Name").AsString;
+				AssetTypeValueField nameField = baseField.Get("m_Name");
+				string? name = nameField.IsDummy ? null : nameField.AsString;
 				if (string.IsNullOrEmpty(name) && TypeID == 48)//Shader
 				{
 					name = baseField.Get("m_ParsedForm").Get("m_Name").AsString;
