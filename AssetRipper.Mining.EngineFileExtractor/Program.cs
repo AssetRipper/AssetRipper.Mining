@@ -195,7 +195,14 @@ internal static class Program
 			this.info = info;
 		}
 
-		public int TypeID => info.TypeId;
+		public int TypeID
+		{
+			get
+			{
+				int result = info.TypeId;
+				return result < 0 ? 114 : result;
+			}
+		}
 
 		public long PathID => info.PathId;
 

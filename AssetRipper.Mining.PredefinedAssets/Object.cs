@@ -34,7 +34,7 @@ public abstract record class Object
 				MonoBehaviour => 114,
 				MonoScript => 115,
 				Shader => 48,
-				Sprite => 49,
+				Sprite => 213,
 				TextAsset => 49,
 				Texture2D => 28,
 				_ => GetGenericTypeID(),
