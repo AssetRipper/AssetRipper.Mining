@@ -15,23 +15,27 @@ internal static class Program
 	public static void Main(string[] args)
 	{
 		string unityFolderPath = args[0];
+		bool silent = args.Length > 1 && args[1] == "--silent";
 		Dictionary<long, Object> defaultDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, DefaultResourcesName));
 		Dictionary<long, Object> extraDictionary = ReadDictionary(Path.Combine(unityFolderPath, ResourcesFolderPath, ExtraResourcesName));
 
-		foreach ((string name, Dictionary<long, Object> dictionary) in new[]{ ("Default", defaultDictionary), ("Extra", extraDictionary) })
-		{
-			Dictionary<int, int> typeIDs = dictionary.Values
-				.Select(a => a.TypeID).Distinct().Order()
-				.ToDictionary(id => id, id => dictionary.Values.Count(a => a.TypeID == id));
-			Console.WriteLine(name);
-			foreach ((int typeID, int count) in typeIDs)
-			{
-				Console.WriteLine($"\t{typeID,4} : {count,3}");
-			}
-		}
-
 		File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "engineassets.json"), new EngineResourceData(defaultDictionary, extraDictionary).ToJson());
-		Console.WriteLine("Done!");
+
+		if (!silent)
+		{
+			foreach ((string name, Dictionary<long, Object> dictionary) in new[] { ("Default", defaultDictionary), ("Extra", extraDictionary) })
+			{
+				Dictionary<int, int> typeIDs = dictionary.Values
+					.Select(a => a.TypeID).Distinct().Order()
+					.ToDictionary(id => id, id => dictionary.Values.Count(a => a.TypeID == id));
+				Console.WriteLine(name);
+				foreach ((int typeID, int count) in typeIDs)
+				{
+					Console.WriteLine($"\t{typeID,4} : {count,3}");
+				}
+			}
+			Console.WriteLine("Done!");
+		}
 	}
 
 	private static Dictionary<long, Object> ReadDictionary(string path)
