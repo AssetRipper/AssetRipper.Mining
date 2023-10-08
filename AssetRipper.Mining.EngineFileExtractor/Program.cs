@@ -211,21 +211,18 @@ internal static class Program
 			get
 			{
 				AssetTypeValueField baseField = BaseField;
-				AssetTypeValueField nameField = baseField.Get("m_Name");
-				string? name = nameField.IsDummy ? null : nameField.AsString;
+				string? name = baseField.TryGet("m_Name")?.AsString;
 				if (string.IsNullOrEmpty(name) && TypeID == 48)//Shader
 				{
-					name = baseField.Get("m_ParsedForm").Get("m_Name").AsString;
+					name = baseField.TryGet("m_ParsedForm")?.TryGet("m_Name")?.AsString //5.5 and later
+						?? baseField.TryGet("m_PathName")?.AsString; //Earlier than 5.5
+					//m_Script could contain the name
 				}
 				return name ?? "";
 			}
 		}
 
-		public string GetString(string fieldName)
-		{
-			AssetTypeValueField field = BaseField.Get(fieldName);
-			return field.IsDummy ? "" : field.AsString ?? "";
-		}
+		public string GetString(string fieldName) => BaseField.TryGet(fieldName)?.AsString ?? "";
 
 		public int GetInt32(string fieldName) => BaseField.Get(fieldName).AsInt;
 
