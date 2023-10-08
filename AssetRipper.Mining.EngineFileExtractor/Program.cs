@@ -1,5 +1,4 @@
 ﻿using AssetRipper.Mining.PredefinedAssets;
-using AssetRipper.Primitives;
 using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 using System.Diagnostics;
@@ -31,7 +30,7 @@ internal static class Program
 			}
 		}
 
-		File.WriteAllText("engineassets.json", new EngineResourceData(defaultDictionary, extraDictionary).ToJson());
+		File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "engineassets.json"), new EngineResourceData(defaultDictionary, extraDictionary).ToJson());
 		Console.WriteLine("Done!");
 	}
 
@@ -81,14 +80,14 @@ internal static class Program
 						obj = new Mesh()
 						{
 							Name = asset.Name,
-							VertexCount = asset.GetBaseField().Get("m_VertexData").Get("m_VertexCount").AsUInt
+							VertexCount = asset.BaseField.Get("m_VertexData").Get("m_VertexCount").AsUInt
 						};
 					}
 					break;
 				case 48://Shader
 					{
 						string[] propertyNames;
-						AssetTypeValueField serializedShader = asset.GetBaseField().Get("m_ParsedForm");
+						AssetTypeValueField serializedShader = asset.BaseField.Get("m_ParsedForm");
 						if (serializedShader.IsDummy)
 						{
 							propertyNames = Array.Empty<string>();
@@ -160,7 +159,7 @@ internal static class Program
 						obj = new Sprite()
 						{
 							Name = asset.Name,
-							Texture = asset.ResolveAsset(asset.GetBaseField().Get("m_RD").Get("texture"))?.Name,
+							Texture = asset.ResolveAsset(asset.BaseField.Get("m_RD").Get("texture"))?.Name,
 						};
 					}
 					break;
@@ -200,7 +199,7 @@ internal static class Program
 		{
 			get
 			{
-				AssetTypeValueField baseField = GetBaseField();
+				AssetTypeValueField baseField = BaseField;
 				AssetTypeValueField nameField = baseField.Get("m_Name");
 				string? name = nameField.IsDummy ? null : nameField.AsString;
 				if (string.IsNullOrEmpty(name) && TypeID == 48)//Shader
@@ -211,15 +210,19 @@ internal static class Program
 			}
 		}
 
-		public string GetString(string fieldName) => GetBaseField().Get(fieldName).AsString ?? "";
+		public string GetString(string fieldName)
+		{
+			AssetTypeValueField field = BaseField.Get(fieldName);
+			return field.IsDummy ? "" : field.AsString ?? "";
+		}
 
-		public int GetInt32(string fieldName) => GetBaseField().Get(fieldName).AsInt;
+		public int GetInt32(string fieldName) => BaseField.Get(fieldName).AsInt;
 
-		public bool GetBoolean(string fieldName) => GetBaseField().Get(fieldName).AsBool;
+		public bool GetBoolean(string fieldName) => BaseField.Get(fieldName).AsBool;
 
 		public UnityAsset? TryGetAsset(string fieldName)
 		{
-			return ResolveAsset(GetBaseField().Get(fieldName));
+			return ResolveAsset(BaseField.Get(fieldName));
 		}
 
 		public UnityAsset? ResolveAsset(AssetTypeValueField pptrField)
@@ -230,7 +233,7 @@ internal static class Program
 				: new UnityAsset(manager, assetExternal.file, assetExternal.info);
 		}
 
-		public AssetTypeValueField GetBaseField() => manager.GetBaseField(file, info);
+		public AssetTypeValueField BaseField => manager.GetBaseField(file, info);
 
 		private string GetDebuggerDisplay()
 		{
