@@ -216,7 +216,13 @@ internal static class Program
 				{
 					name = baseField.TryGet("m_ParsedForm")?.TryGet("m_Name")?.AsString //5.5 and later
 						?? baseField.TryGet("m_PathName")?.AsString; //Earlier than 5.5
-					//m_Script could contain the name
+
+					if (string.IsNullOrEmpty(name)
+						&& (baseField.TryGet("m_Script")?.AsString?.StartsWith("Shader \"Standard\"", StringComparison.Ordinal) ?? false))
+					{
+						//A regex could be used to generalize, but as far as I know, Standard is the only one like this.
+						name = "Standard";
+					}
 				}
 				return name ?? "";
 			}
