@@ -31,10 +31,22 @@ public sealed record class TextAsset : NamedObject
 	private static UInt128 HashData(ReadOnlySpan<byte> data)
 	{
 		Span<byte> buffer = stackalloc byte[16];
-		MD5.HashData(data, buffer);
+		HashData(data, buffer);
+#if NET8_0_OR_GREATER
+		return BinaryPrimitives.ReadUInt128LittleEndian(buffer);
+#else
 		return new UInt128(
 			BinaryPrimitives.ReadUInt64LittleEndian(buffer[8..]),
 			BinaryPrimitives.ReadUInt64LittleEndian(buffer));
-		//On .NET 8, replace with ReadUInt128LittleEndian
+#endif
+	}
+
+	private static void HashData(ReadOnlySpan<byte> data, Span<byte> buffer)
+	{
+#if NET5_0_OR_GREATER
+		MD5.HashData(data, buffer);
+#else
+		MD5.Create().ComputeHash(data.ToArray()).AsSpan().CopyTo(buffer);
+#endif
 	}
 }

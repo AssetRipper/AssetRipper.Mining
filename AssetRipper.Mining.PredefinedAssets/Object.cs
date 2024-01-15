@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AssetRipper.Mining.PredefinedAssets;
 
@@ -54,5 +55,15 @@ public abstract record class Object
 			NamedObject => 130,
 			_ => 0,
 		};
+	}
+
+	public string ToJson()
+	{
+		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.Object);
+	}
+
+	public static Object? FromJson(string text)
+	{
+		return JsonSerializer.Deserialize(text, InternalSerializerContext.Default.Object);
 	}
 }

@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetRipper.Mining.Predefin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetRipper.Mining.EngineFileExtractor", "AssetRipper.Mining.EngineFileExtractor\AssetRipper.Mining.EngineFileExtractor.csproj", "{DAD9BA2F-8A03-43D8-A3E5-73493A10AF0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetRipper.Mining.PredefinedAssets.Tests", "AssetRipper.Mining.PredefinedAssets.Tests\AssetRipper.Mining.PredefinedAssets.Tests.csproj", "{C3E8E9EA-1710-4346-B96A-EA757FB13301}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{DAD9BA2F-8A03-43D8-A3E5-73493A10AF0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAD9BA2F-8A03-43D8-A3E5-73493A10AF0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAD9BA2F-8A03-43D8-A3E5-73493A10AF0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E8E9EA-1710-4346-B96A-EA757FB13301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E8E9EA-1710-4346-B96A-EA757FB13301}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E8E9EA-1710-4346-B96A-EA757FB13301}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E8E9EA-1710-4346-B96A-EA757FB13301}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
