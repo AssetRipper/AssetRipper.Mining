@@ -19,4 +19,16 @@ public sealed record class AudioClip : NamedObject
 	/// 5.0.0 to Max
 	/// </summary>
 	public required float Length { get; init; }
+
+	public AudioClip()
+	{
+	}
+
+	[SetsRequiredMembers]
+	public AudioClip(string name, int channels, int frequency, float length) : base(name)
+	{
+		Channels = channels;
+		Frequency = frequency;
+		Length = length;
+	}
 }

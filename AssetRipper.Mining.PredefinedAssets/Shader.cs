@@ -18,4 +18,14 @@ public sealed record class Shader : NamedObject
 	{
 		return HashCode.Combine(Name, PropertyNames.Length);
 	}
+
+	public Shader()
+	{
+	}
+
+	[SetsRequiredMembers]
+	public Shader(string name, string[] propertyNames) : base(name)
+	{
+		PropertyNames = propertyNames;
+	}
 }
