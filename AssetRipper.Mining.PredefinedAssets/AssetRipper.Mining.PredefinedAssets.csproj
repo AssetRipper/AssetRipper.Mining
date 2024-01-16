@@ -9,7 +9,7 @@
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<Authors>ds5678</Authors>
 		<Company>AssetRipper</Company>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<PackageId>AssetRipper.Mining.PredefinedAssets</PackageId>
 		<PackageTags>C# Unity</PackageTags>
