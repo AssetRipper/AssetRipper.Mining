@@ -4,6 +4,10 @@ namespace AssetRipper.Mining.PredefinedAssets;
 
 public readonly record struct EngineResourceData(Dictionary<long, Object> DefaultResources, Dictionary<long, Object> ExtraResources)
 {
+	public EngineResourceData() : this(new(), new())
+	{
+	}
+
 	public readonly string ToJson()
 	{
 		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.EngineResourceData);

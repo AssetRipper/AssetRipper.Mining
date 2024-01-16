@@ -21,8 +21,16 @@ public readonly record struct UnityPackageData(
 	bool UsedInPackageJson,
 	Dictionary<string, UnityGuid> Assemblies,
 	Dictionary<string, Dictionary<string, UnityGuid>> Scripts,
-	KeyValuePair<Object, UnityGuid>[] Assets)
+	Dictionary<Object, UnityGuid> Assets)
 {
+	public UnityPackageData(string name, string version, bool usedInPackageJson) : this(name, version, usedInPackageJson, new(), new(), new())
+	{
+	}
+
+	public UnityPackageData(string name, string version = "") : this(name, version, string.IsNullOrEmpty(version))
+	{
+	}
+
 	public readonly string ToJson()
 	{
 		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.UnityPackageData);
