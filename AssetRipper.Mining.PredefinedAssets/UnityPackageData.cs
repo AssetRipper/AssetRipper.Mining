@@ -21,8 +21,10 @@ public readonly record struct UnityPackageData(
 	bool UsedInPackageJson,
 	Dictionary<string, UnityGuid> Assemblies,
 	Dictionary<string, Dictionary<string, UnityGuid>> Scripts,
-	Dictionary<Object, UnityGuid> Assets)
+	List<KeyValuePair<Object, PPtr>> Assets)
 {
+	//Assets is a list because dictionaries require simple types as keys for serialization.
+
 	public UnityPackageData(string name, string version, bool usedInPackageJson) : this(name, version, usedInPackageJson, new(), new(), new())
 	{
 	}
