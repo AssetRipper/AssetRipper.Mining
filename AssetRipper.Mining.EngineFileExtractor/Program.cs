@@ -84,7 +84,8 @@ internal static class Program
 						obj = new Mesh()
 						{
 							Name = asset.Name,
-							VertexCount = asset.BaseField.Get("m_VertexData").Get("m_VertexCount").AsUInt
+							VertexCount = asset.BaseField.Get("m_VertexData").Get("m_VertexCount").AsInt,
+							SubMeshCount = asset.BaseField.Get("m_SubMeshes").Get("Array").Children.Count
 						};
 					}
 					break;
