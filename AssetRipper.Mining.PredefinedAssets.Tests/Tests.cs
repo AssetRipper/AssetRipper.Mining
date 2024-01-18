@@ -22,6 +22,7 @@ public class Tests
 	public void UnityPackageDataCanBeSerialized()
 	{
 		UnityPackageData package = new UnityPackageData("Example", "1.0.0", true);
+		package.Assets.Add(new TextAsset("", ""u8), default);
 		string json = package.ToJson();
 		Assert.That(json, Is.Not.Empty);
 	}
@@ -35,7 +36,7 @@ public class Tests
 		static string MakeJson()
 		{
 			UnityPackageData package = new UnityPackageData("Example", "1.0.0", true);
-			package.AddAsset(new TextAsset("", ""u8), default);
+			package.Assets.Add(new TextAsset("", ""u8), default);
 			return package.ToJson();
 		}
 	}
