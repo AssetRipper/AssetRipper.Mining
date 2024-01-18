@@ -2,7 +2,9 @@
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(UInt128))]
 #else
 using AssetRipper.Mining.PredefinedAssets;
+using System.Buffers;
 using System.Numerics;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace System;
@@ -35,6 +37,15 @@ public readonly record struct UInt128
 		return TryParse(value, out UInt128 result) ? result : throw new FormatException("Input string was not in a correct format.");
 	}
 
+	internal static UInt128 Parse(ReadOnlySpan<byte> value)
+	{
+		byte[] rented = ArrayPool<byte>.Shared.Rent(value.Length);
+		value.CopyTo(rented);
+		UInt128 result = Parse(Encoding.ASCII.GetString(rented, 0, value.Length));
+		ArrayPool<byte>.Shared.Return(rented);
+		return result;
+	}
+
 	public static bool TryParse(string value, out UInt128 result)
 	{
 		if (BigInteger.TryParse(value, out BigInteger bigInteger))
@@ -57,8 +68,10 @@ public readonly record struct UInt128
 	private static UInt128 FromBigInteger(BigInteger value)
 	{
 		ulong upper = (ulong)(value >> 64);
-		ulong lower = (ulong)value;
+		ulong lower = (ulong)(value & LowerBitMask);
 		return new UInt128(upper, lower);
 	}
+
+	private static readonly BigInteger LowerBitMask = new BigInteger(ulong.MaxValue);
 }
 #endif

@@ -17,4 +17,26 @@ public class Tests
 			}
 			""".Replace(Environment.NewLine, "\n")));
 	}
+
+	[Test]
+	public void UnityPackageDataCanBeSerialized()
+	{
+		UnityPackageData package = new UnityPackageData("Example", "1.0.0", true);
+		string json = package.ToJson();
+		Assert.That(json, Is.Not.Empty);
+	}
+
+	[Test]
+	public void UnityPackageDataCanBeDeserialized()
+	{
+		UnityPackageData package = UnityPackageData.FromJson(MakeJson());
+		Assert.That(package.Assets, Is.Not.Empty);
+
+		static string MakeJson()
+		{
+			UnityPackageData package = new UnityPackageData("Example", "1.0.0", true);
+			package.AddAsset(new TextAsset("", ""u8), default);
+			return package.ToJson();
+		}
+	}
 }

@@ -8,7 +8,7 @@ public sealed class UInt128JsonConverter : JsonConverter<UInt128>
 {
 	public override UInt128 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		return UInt128.Parse(reader.GetString() ?? throw new JsonException("String was read as null"));
+		return UInt128.Parse(reader.ValueSpan);
 	}
 
 	public override void Write(Utf8JsonWriter writer, UInt128 value, JsonSerializerOptions options)
