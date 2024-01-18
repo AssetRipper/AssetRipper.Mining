@@ -42,4 +42,14 @@ public readonly record struct UnityPackageData(
 	{
 		return JsonSerializer.Deserialize(text, InternalSerializerContext.Default.UnityPackageData);
 	}
+
+	public void AddAsset(Object asset, PPtr pptr)
+	{
+		Assets.Add(new KeyValuePair<Object, PPtr>(asset, pptr));
+	}
+
+	public void AddScript(MonoScript script, UnityGuid guid)
+	{
+		AddAsset(script, new PPtr(11500000, guid, AssetType.Meta));
+	}
 }
