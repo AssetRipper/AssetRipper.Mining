@@ -32,6 +32,23 @@ public readonly struct AssetDictionary : IReadOnlyCollection<KeyValuePair<Object
 		return _dictionary.ContainsKey(key);
 	}
 
+	public bool TryAdd(Object key, PPtr value)
+	{
+#if NETSTANDARD
+		if (_dictionary.ContainsKey(key))
+		{
+			return false;
+		}
+		else
+		{
+			_dictionary.Add(key, value);
+			return true;
+		}
+#else
+		return _dictionary.TryAdd(key, value);
+#endif
+	}
+
 	public bool TryGetValue(Object key, out PPtr value)
 	{
 		return _dictionary.TryGetValue(key, out value);
