@@ -8,11 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AssetsTools.NET" Version="3.0.0-preview3" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\AssetRipper.Mining.PredefinedAssets\AssetRipper.Mining.PredefinedAssets.csproj" />
+		<ProjectReference Include="..\..\AssetRipper\Source\AssetRipper.Import\AssetRipper.Import.csproj" />
 	</ItemGroup>
 
 </Project>

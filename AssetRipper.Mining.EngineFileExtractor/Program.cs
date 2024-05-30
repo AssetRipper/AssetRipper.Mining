@@ -1,7 +1,15 @@
-﻿using AssetRipper.Mining.PredefinedAssets;
-using AssetsTools.NET;
-using AssetsTools.NET.Extra;
-using System.Diagnostics;
+﻿using AssetRipper.Assets;
+using AssetRipper.Assets.Bundles;
+using AssetRipper.Assets.Collections;
+using AssetRipper.Assets.Generics;
+using AssetRipper.Assets.IO;
+using AssetRipper.Assets.Metadata;
+using AssetRipper.Import.AssetCreation;
+using AssetRipper.Import.Structure.Assembly.Serializable;
+using AssetRipper.Import.Structure.Assembly.TypeTrees;
+using AssetRipper.IO.Endian;
+using AssetRipper.IO.Files.SerializedFiles.Parser;
+using AssetRipper.Mining.PredefinedAssets;
 using Object = AssetRipper.Mining.PredefinedAssets.Object;
 
 namespace AssetRipper.Mining.EngineFileExtractor;
@@ -43,29 +51,45 @@ internal static class Program
 		return LoadAllAssetInfo(path).OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
 	}
 
-	private static IEnumerable<UnityAsset> LoadAllAssets(string path)
+	private static AssetCollection LoadAllAssets(string path)
 	{
-		AssetsManager manager = new();
-		AssetsFileInstance assetsFileInstance = manager.LoadAssetsFile(path, false);
-		foreach (AssetFileInfo assetFileInfo in assetsFileInstance.file.AssetInfos)
+		return GameBundle.FromPaths([path], TypeTreeAssetFactory.Instance).FetchAssetCollections().Single();
+	}
+
+	private sealed class TypeTreeAssetFactory : AssetFactoryBase
+	{
+		public static TypeTreeAssetFactory Instance { get; } = new();
+		public override IUnityObjectBase? ReadAsset(AssetInfo assetInfo, ReadOnlyArraySegment<byte> assetData, SerializedType? assetType)
 		{
-			yield return new UnityAsset(manager, assetsFileInstance, assetFileInfo);
+			ArgumentNullException.ThrowIfNull(assetType);
+			ArgumentOutOfRangeException.ThrowIfZero(assetType.OldType.Nodes.Count);
+			if (!TypeTreeNodeStruct.TryMakeFromTypeTree(assetType.OldType, out TypeTreeNodeStruct root))
+			{
+				throw new NotSupportedException("Type tree node struct creation failed");
+			}
+			else
+			{
+				TypeTreeObject asset = TypeTreeObject.Create(assetInfo, root);
+				EndianSpanReader reader = new(assetData, assetInfo.Collection.EndianType);
+				asset.Read(ref reader);
+				return asset;
+			}
 		}
 	}
 
 	private static IEnumerable<KeyValuePair<long, Object>> LoadAllAssetInfo(string path)
 	{
-		foreach (UnityAsset asset in LoadAllAssets(path))
+		foreach (TypeTreeObject asset in LoadAllAssets(path).Cast<TypeTreeObject>())
 		{
 			Object obj;
-			switch (asset.TypeID)
+			switch (asset.ClassID)
 			{
 				case 21://Material
 					{
 						obj = new Material()
 						{
-							Name = asset.Name,
-							Shader = asset.TryGetAsset("m_Shader")?.Name
+							Name = asset.Name(),
+							Shader = asset.TryGetAsset("m_Shader")?.Name()
 						};
 					}
 					break;
@@ -73,7 +97,7 @@ internal static class Program
 					{
 						obj = new Texture2D()
 						{
-							Name = asset.Name,
+							Name = asset.Name(),
 							Height = asset.GetInt32("m_Height"),
 							Width = asset.GetInt32("m_Width")
 						};
@@ -83,40 +107,40 @@ internal static class Program
 					{
 						obj = new Mesh()
 						{
-							Name = asset.Name,
-							VertexCount = asset.BaseField.Get("m_VertexData").Get("m_VertexCount").AsInt,
-							SubMeshCount = asset.BaseField.Get("m_SubMeshes").Get("Array").Children.Count
+							Name = asset.Name(),
+							VertexCount = asset.ReleaseFields["m_VertexData"].AsStructure["m_VertexCount"].AsInt32,
+							SubMeshCount = asset.ReleaseFields["m_SubMeshes"].AsAssetArray.Length,
 						};
 					}
 					break;
 				case 48://Shader
 					{
 						string[] propertyNames;
-						AssetTypeValueField serializedShader = asset.BaseField.Get("m_ParsedForm");
-						if (serializedShader.IsDummy)
+						SerializableStructure? serializedShader = asset.ReleaseFields.TryGetField("m_ParsedForm")?.AsStructure;
+						if (serializedShader is null)
 						{
 							propertyNames = Array.Empty<string>();
 						}
 						else
 						{
-							List<AssetTypeValueField> propsList = serializedShader.Get("m_PropInfo").Get("m_Props").Get("Array").Children;
-							if (propsList.Count == 0)
+							IUnityAssetBase[] propsList = serializedShader["m_PropInfo"].AsStructure["m_Props"].AsAssetArray;
+							if (propsList.Length == 0)
 							{
 								propertyNames = Array.Empty<string>();
 							}
 							else
 							{
-								propertyNames = new string[propsList.Count];
-								for (int i = 0; i < propsList.Count; i++)
+								propertyNames = new string[propsList.Length];
+								for (int i = 0; i < propsList.Length; i++)
 								{
-									propertyNames[i] = propsList[i].Get("m_Name").AsString ?? "";
+									propertyNames[i] = ((SerializableStructure)propsList[i])["m_Name"].AsString;
 								}
 							}
 						}
 
 						obj = new Shader()
 						{
-							Name = asset.Name,
+							Name = asset.Name(),
 							PropertyNames = propertyNames
 						};
 					}
@@ -127,7 +151,7 @@ internal static class Program
 					{
 						obj = new Cubemap()
 						{
-							Name = asset.Name,
+							Name = asset.Name(),
 							Height = asset.GetInt32("m_Height"),
 							Width = asset.GetInt32("m_Width")
 						};
@@ -135,14 +159,14 @@ internal static class Program
 					break;
 				case 114://MonoBehaviour
 					{
-						UnityAsset? script = asset.TryGetAsset("m_Script");
+						TypeTreeObject? script = asset.TryGetAsset("m_Script");
 						obj = new MonoBehaviour()
 						{
-							Name = asset.Name,
+							Name = asset.Name(),
 							AssemblyName = script?.GetString("m_AssemblyName") ?? "",
 							Namespace = script?.GetString("m_Namespace") ?? "",
 							ClassName = script?.GetString("m_ClassName") ?? "",
-							GameObject = asset.TryGetAsset("m_GameObject")?.Name,
+							GameObject = asset.TryGetAsset("m_GameObject")?.Name(),
 							Enabled = asset.GetBoolean("m_Enabled")
 						};
 					}
@@ -163,8 +187,8 @@ internal static class Program
 					{
 						obj = new Sprite()
 						{
-							Name = asset.Name,
-							Texture = asset.ResolveAsset(asset.BaseField.Get("m_RD").Get("texture"))?.Name,
+							Name = asset.Name(),
+							Texture = asset.ResolveAsset(asset.ReleaseFields["m_RD"].AsStructure["texture"].AsPPtr)?.Name(),
 						};
 					}
 					break;
@@ -173,86 +197,12 @@ internal static class Program
 				default:
 					obj = new GenericNamedObject()
 					{
-						TypeID = asset.TypeID,
-						Name = asset.Name
+						TypeID = asset.ClassID,
+						Name = asset.Name()
 					};
 					break;
 			}
 			yield return new KeyValuePair<long, Object>(asset.PathID, obj);
-		}
-	}
-
-	[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-	private readonly struct UnityAsset
-	{
-		private readonly AssetsManager manager;
-		private readonly AssetsFileInstance file;
-		private readonly AssetFileInfo info;
-
-		public UnityAsset(AssetsManager manager, AssetsFileInstance file, AssetFileInfo info)
-		{
-			this.manager = manager;
-			this.file = file;
-			this.info = info;
-		}
-
-		public int TypeID
-		{
-			get
-			{
-				int result = info.TypeId;
-				return result < 0 ? 114 : result;
-			}
-		}
-
-		public long PathID => info.PathId;
-
-		public string Name
-		{
-			get
-			{
-				AssetTypeValueField baseField = BaseField;
-				string? name = baseField.TryGet("m_Name")?.AsString;
-				if (string.IsNullOrEmpty(name) && TypeID == 48)//Shader
-				{
-					name = baseField.TryGet("m_ParsedForm")?.TryGet("m_Name")?.AsString //5.5 and later
-						?? baseField.TryGet("m_PathName")?.AsString; //Earlier than 5.5
-
-					if (string.IsNullOrEmpty(name)
-						&& (baseField.TryGet("m_Script")?.AsString?.StartsWith("Shader \"Standard\"", StringComparison.Ordinal) ?? false))
-					{
-						//A regex could be used to generalize, but as far as I know, Standard is the only one like this.
-						name = "Standard";
-					}
-				}
-				return name ?? "";
-			}
-		}
-
-		public string GetString(string fieldName) => BaseField.TryGet(fieldName)?.AsString ?? "";
-
-		public int GetInt32(string fieldName) => BaseField.Get(fieldName).AsInt;
-
-		public bool GetBoolean(string fieldName) => BaseField.Get(fieldName).AsBool;
-
-		public UnityAsset? TryGetAsset(string fieldName)
-		{
-			return ResolveAsset(BaseField.Get(fieldName));
-		}
-
-		public UnityAsset? ResolveAsset(AssetTypeValueField pptrField)
-		{
-			AssetExternal assetExternal = manager.GetExtAsset(file, pptrField);
-			return assetExternal.file is null || assetExternal.info is null
-				? null
-				: new UnityAsset(manager, assetExternal.file, assetExternal.info);
-		}
-
-		public AssetTypeValueField BaseField => manager.GetBaseField(file, info);
-
-		private string GetDebuggerDisplay()
-		{
-			return $"{TypeID} : {Name}";
 		}
 	}
 }
