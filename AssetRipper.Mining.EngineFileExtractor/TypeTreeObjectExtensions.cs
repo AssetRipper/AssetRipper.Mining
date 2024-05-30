@@ -47,6 +47,11 @@ internal static class TypeTreeObjectExtensions
 		return asset.ReleaseFields[fieldName].AsString;
 	}
 
+	public static string? TryGetString(this TypeTreeObject asset, string fieldName)
+	{
+		return asset.ReleaseFields.TryGetField(fieldName)?.AsString;
+	}
+
 	public static TypeTreeObject? ResolveAsset(this TypeTreeObject asset, IPPtr pptr)
 	{
 		return asset.Collection.TryGetAsset(new PPtr<TypeTreeObject>(pptr.FileID, pptr.PathID));

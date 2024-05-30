@@ -163,7 +163,7 @@ internal static class Program
 						obj = new MonoBehaviour()
 						{
 							Name = asset.Name(),
-							AssemblyName = script?.GetString("m_AssemblyName") ?? "",
+							AssemblyName = script?.TryGetString("m_AssemblyName") ?? "",
 							Namespace = script?.GetString("m_Namespace") ?? "",
 							ClassName = script?.GetString("m_ClassName") ?? "",
 							GameObject = asset.TryGetAsset("m_GameObject")?.Name(),
@@ -175,7 +175,7 @@ internal static class Program
 					{
 						obj = new MonoScript()
 						{
-							AssemblyName = asset.GetString("m_AssemblyName"),
+							AssemblyName = asset.TryGetString("m_AssemblyName") ?? "",
 							Namespace = asset.GetString("m_Namespace"),
 							ClassName = asset.GetString("m_ClassName")
 						};
