@@ -2,7 +2,7 @@
 
 namespace AssetRipper.Mining.PredefinedAssets;
 
-[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSourceGenerationOptions(WriteIndented = true, IncludeFields = true)]
 [JsonSerializable(typeof(EngineResourceData))]
 [JsonSerializable(typeof(UnityPackageData))]
 [JsonSerializable(typeof(ReferenceAssemblyData))]
