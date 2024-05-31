@@ -6,11 +6,11 @@ public readonly record struct ReferenceAssemblyData(List<string> Unity, List<str
 {
 	public string ToJson()
 	{
-		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.ReferenceAssemblyData);
+		return JsonSerializer.Serialize(this, MiningSerializerContext.Default.ReferenceAssemblyData);
 	}
 
 	public static ReferenceAssemblyData FromJson(string json)
 	{
-		return JsonSerializer.Deserialize<ReferenceAssemblyData>(json, InternalSerializerContext.Default.ReferenceAssemblyData);
+		return JsonSerializer.Deserialize<ReferenceAssemblyData>(json, MiningSerializerContext.Default.ReferenceAssemblyData);
 	}
 }

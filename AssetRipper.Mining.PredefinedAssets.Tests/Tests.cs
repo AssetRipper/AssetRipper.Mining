@@ -1,3 +1,6 @@
+using System.Numerics;
+using System.Text.Json;
+
 namespace AssetRipper.Mining.PredefinedAssets.Tests;
 
 public class Tests
@@ -39,5 +42,27 @@ public class Tests
 			package.Assets.Add(new TextAsset("", ""u8), default);
 			return package.ToJson();
 		}
+	}
+
+	[Test]
+	public void Vector3Serialization()
+	{
+		string result = """
+		{
+		  "X": 1,
+		  "Y": 2,
+		  "Z": 3
+		}
+		""".Replace("\r", null);
+		Vector3 vector = new Vector3(1.0f, 2.0f, 3.0f);
+		Assert.That(JsonSerializer.Serialize(vector, MiningSerializerContext.Default.Vector3).Replace("\r", null), Is.EqualTo(result));
+	}
+
+	[Test]
+	public void Vector3Deserialization()
+	{
+		string json = """{ "X": 1.0, "Y": 2.0, "Z": 3.0 }""";
+		Vector3 result = new Vector3(1.0f, 2.0f, 3.0f);
+		Assert.That(JsonSerializer.Deserialize(json, MiningSerializerContext.Default.Vector3), Is.EqualTo(result));
 	}
 }

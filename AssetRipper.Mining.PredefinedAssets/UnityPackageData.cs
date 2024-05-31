@@ -1,9 +1,8 @@
-﻿using AssetRipper.Primitives;
-using System.Text.Json;
-#if NETSTANDARD
-using AssemblyDictionary = System.Collections.Generic.Dictionary<string, string>;
-#else
+﻿using System.Text.Json;
+#if NET5_0_OR_GREATER
 using AssemblyDictionary = System.Collections.Generic.Dictionary<string, AssetRipper.Primitives.UnityGuid>;
+#else
+using AssemblyDictionary = System.Collections.Generic.Dictionary<string, string>;
 #endif
 
 namespace AssetRipper.Mining.PredefinedAssets;
@@ -36,11 +35,11 @@ public readonly record struct UnityPackageData(
 
 	public readonly string ToJson()
 	{
-		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.UnityPackageData);
+		return JsonSerializer.Serialize(this, MiningSerializerContext.Default.UnityPackageData);
 	}
 
 	public static UnityPackageData FromJson(string text)
 	{
-		return JsonSerializer.Deserialize(text, InternalSerializerContext.Default.UnityPackageData);
+		return JsonSerializer.Deserialize(text, MiningSerializerContext.Default.UnityPackageData);
 	}
 }

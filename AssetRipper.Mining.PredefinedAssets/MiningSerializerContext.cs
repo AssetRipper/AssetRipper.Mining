@@ -6,6 +6,6 @@ namespace AssetRipper.Mining.PredefinedAssets;
 [JsonSerializable(typeof(EngineResourceData))]
 [JsonSerializable(typeof(UnityPackageData))]
 [JsonSerializable(typeof(ReferenceAssemblyData))]
-internal sealed partial class InternalSerializerContext : JsonSerializerContext
+public sealed partial class MiningSerializerContext : JsonSerializerContext
 {
 }
