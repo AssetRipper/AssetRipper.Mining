@@ -108,7 +108,7 @@ internal static class Program
 						obj = new Mesh()
 						{
 							Name = asset.Name(),
-							VertexCount = asset.ReleaseFields["m_VertexData"].AsStructure["m_VertexCount"].AsInt32,
+							VertexCount = asset.ReleaseFields["m_VertexData"]["m_VertexCount"].AsInt32,
 							SubMeshCount = asset.ReleaseFields["m_SubMeshes"].AsAssetArray.Length,
 							LocalAABB = asset.ReleaseFields["m_LocalAABB"].AsAxisAlignedBoundingBox(),
 						};
@@ -124,7 +124,7 @@ internal static class Program
 						}
 						else
 						{
-							IUnityAssetBase[] propsList = serializedShader["m_PropInfo"].AsStructure["m_Props"].AsAssetArray;
+							IUnityAssetBase[] propsList = serializedShader["m_PropInfo"]["m_Props"].AsAssetArray;
 							if (propsList.Length == 0)
 							{
 								propertyNames = Array.Empty<string>();
@@ -189,7 +189,7 @@ internal static class Program
 						obj = new Sprite()
 						{
 							Name = asset.Name(),
-							Texture = asset.ResolveAsset(asset.ReleaseFields["m_RD"].AsStructure["texture"].AsPPtr)?.Name(),
+							Texture = asset.ResolveAsset(asset.ReleaseFields["m_RD"]["texture"].AsPPtr)?.Name(),
 						};
 					}
 					break;
