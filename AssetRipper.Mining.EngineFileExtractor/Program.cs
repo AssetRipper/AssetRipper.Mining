@@ -110,21 +110,7 @@ internal static class Program
 							Name = asset.Name(),
 							VertexCount = asset.ReleaseFields["m_VertexData"].AsStructure["m_VertexCount"].AsInt32,
 							SubMeshCount = asset.ReleaseFields["m_SubMeshes"].AsAssetArray.Length,
-							LocalAABB = new()
-							{
-								Center = new()
-								{
-									X = asset.ReleaseFields["m_LocalAABB"].AsStructure["m_Center"].AsStructure["x"].AsSingle,
-									Y = asset.ReleaseFields["m_LocalAABB"].AsStructure["m_Center"].AsStructure["y"].AsSingle,
-									Z = asset.ReleaseFields["m_LocalAABB"].AsStructure["m_Center"].AsStructure["z"].AsSingle
-								},
-								Extents = new()
-								{
-									X = asset.ReleaseFields["m_LocalAABB"].AsStructure["m_Extent"].AsStructure["x"].AsSingle,
-									Y = asset.ReleaseFields["m_LocalAABB"].AsStructure["m_Extent"].AsStructure["y"].AsSingle,
-									Z = asset.ReleaseFields["m_LocalAABB"].AsStructure["m_Extent"].AsStructure["z"].AsSingle
-								}
-							}
+							LocalAABB = asset.ReleaseFields["m_LocalAABB"].AsAxisAlignedBoundingBox(),
 						};
 					}
 					break;
