@@ -48,6 +48,10 @@ internal static class Program
 
 	private static Dictionary<long, Object> ReadDictionary(string path)
 	{
+		if (!File.Exists(path))
+		{
+			return [];
+		}
 		return LoadAllAssetInfo(path).OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
 	}
 
@@ -108,7 +112,9 @@ internal static class Program
 						obj = new Mesh()
 						{
 							Name = asset.Name(),
-							VertexCount = asset.ReleaseFields["m_VertexData"]["m_VertexCount"].AsInt32,
+							VertexCount = asset.ReleaseFields.ContainsField("m_VertexData")
+								? asset.ReleaseFields["m_VertexData"]["m_VertexCount"].AsInt32
+								: asset.ReleaseFields["m_CompressedMesh"]["m_Vertices"]["m_NumItems"].AsInt32,
 							SubMeshCount = asset.ReleaseFields["m_SubMeshes"].AsAssetArray.Length,
 							LocalAABB = asset.ReleaseFields["m_LocalAABB"].AsAxisAlignedBoundingBox(),
 						};
