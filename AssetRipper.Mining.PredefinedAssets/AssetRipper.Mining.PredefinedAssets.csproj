@@ -5,11 +5,11 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>Latest</LangVersion>
 		<Nullable>enable</Nullable>
-		<IsTrimmable>true</IsTrimmable>
+		<IsAotCompatible>true</IsAotCompatible>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<Authors>ds5678</Authors>
 		<Company>AssetRipper</Company>
-		<Version>1.2.1</Version>
+		<Version>1.3.2</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<PackageId>AssetRipper.Mining.PredefinedAssets</PackageId>
 		<PackageTags>C# Unity</PackageTags>
@@ -26,7 +26,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AssetRipper.Primitives" Version="3.1.1" />
+		<PackageReference Include="AssetRipper.Primitives" Version="3.1.2" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

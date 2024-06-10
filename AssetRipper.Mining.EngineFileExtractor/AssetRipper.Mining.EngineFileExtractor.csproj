@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AssetsTools.NET" Version="3.0.0-preview3" />
+		<PackageReference Include="AssetsTools.NET" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

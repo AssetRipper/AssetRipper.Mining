@@ -85,7 +85,8 @@ internal static class Program
 						{
 							Name = asset.Name,
 							VertexCount = asset.BaseField.Get("m_VertexData").Get("m_VertexCount").AsInt,
-							SubMeshCount = asset.BaseField.Get("m_SubMeshes").Get("Array").Children.Count
+							SubMeshCount = asset.BaseField.Get("m_SubMeshes").Get("Array").Children.Count,
+							LocalAABB = asset.BaseField.Get("m_LocalAABB").AsAxisAlignedBoundingBox(),
 						};
 					}
 					break;

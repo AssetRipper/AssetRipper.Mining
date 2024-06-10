@@ -59,11 +59,11 @@ public abstract record class Object
 
 	public string ToJson()
 	{
-		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.Object);
+		return JsonSerializer.Serialize(this, MiningSerializerContext.Default.Object);
 	}
 
 	public static Object? FromJson(string text)
 	{
-		return JsonSerializer.Deserialize(text, InternalSerializerContext.Default.Object);
+		return JsonSerializer.Deserialize(text, MiningSerializerContext.Default.Object);
 	}
 }

@@ -10,11 +10,11 @@ public readonly record struct EngineResourceData(Dictionary<long, Object> Defaul
 
 	public readonly string ToJson()
 	{
-		return JsonSerializer.Serialize(this, InternalSerializerContext.Default.EngineResourceData);
+		return JsonSerializer.Serialize(this, MiningSerializerContext.Default.EngineResourceData);
 	}
 
 	public static EngineResourceData FromJson(string text)
 	{
-		return JsonSerializer.Deserialize(text, InternalSerializerContext.Default.EngineResourceData);
+		return JsonSerializer.Deserialize(text, MiningSerializerContext.Default.EngineResourceData);
 	}
 }
