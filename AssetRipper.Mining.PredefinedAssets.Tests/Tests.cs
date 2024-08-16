@@ -65,4 +65,21 @@ public class Tests
 		Vector3 result = new Vector3(1.0f, 2.0f, 3.0f);
 		Assert.That(JsonSerializer.Deserialize(json, MiningSerializerContext.Default.Vector3), Is.EqualTo(result));
 	}
+
+	[TestCase("")]
+	[TestCase("{}")]
+	public void EmptyEngineResourceDataDeserialization(string json)
+	{
+		EngineResourceData result = EngineResourceData.FromJson(json);
+		Assert.Multiple(() =>
+		{
+			Assert.That(result.DefaultResources, Is.Not.Null);
+			Assert.That(result.ExtraResources, Is.Not.Null);
+		});
+		Assert.Multiple(() =>
+		{
+			Assert.That(result.DefaultResources, Is.Empty);
+			Assert.That(result.ExtraResources, Is.Empty);
+		});
+	}
 }
