@@ -1,5 +1,4 @@
-﻿using AssetRipper.Primitives;
-using System.Collections;
+﻿using System.Collections;
 
 namespace AssetRipper.Mining.PredefinedAssets;
 

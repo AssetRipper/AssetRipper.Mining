@@ -1,6 +1,4 @@
-﻿using AssetRipper.Primitives;
-
-namespace AssetRipper.Mining.PredefinedAssets;
+﻿namespace AssetRipper.Mining.PredefinedAssets;
 
 /// <summary>
 /// A data structure representing a reference to an asset.
