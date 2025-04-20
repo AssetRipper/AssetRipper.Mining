@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace AssetRipper.Mining.PredefinedAssets;
+﻿namespace AssetRipper.Mining.PredefinedAssets;
 
 public sealed record class GameObject : Object
 {

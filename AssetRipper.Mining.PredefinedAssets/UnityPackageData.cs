@@ -1,9 +1,4 @@
 ﻿using System.Text.Json;
-#if NET5_0_OR_GREATER
-using AssemblyDictionary = System.Collections.Generic.Dictionary<string, AssetRipper.Primitives.UnityGuid>;
-#else
-using AssemblyDictionary = System.Collections.Generic.Dictionary<string, string>;
-#endif
 
 namespace AssetRipper.Mining.PredefinedAssets;
 
@@ -22,7 +17,7 @@ public readonly record struct UnityPackageData(
 	string Name,
 	string Version,
 	bool UsedInPackageJson,
-	AssemblyDictionary Assemblies,
+	Dictionary<string, UnityGuid> Assemblies,
 	AssetDictionary Assets)
 {
 	public UnityPackageData(string name, string version, bool usedInPackageJson) : this(name, version, usedInPackageJson, new(), new())
