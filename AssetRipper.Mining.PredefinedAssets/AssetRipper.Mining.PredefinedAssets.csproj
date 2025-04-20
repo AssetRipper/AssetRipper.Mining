@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>Latest</LangVersion>
 		<Nullable>enable</Nullable>
-		<IsAotCompatible>true</IsAotCompatible>
+		<IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<Authors>ds5678</Authors>
