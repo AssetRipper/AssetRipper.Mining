@@ -20,6 +20,6 @@ public sealed record class MonoScript : Object
 
 	public static MonoScript FromType(Type type)
 	{
-		return new MonoScript(type.Assembly.GetName().Name, type.Namespace, type.Name);
+		return new MonoScript(type.Assembly.GetName().Name ?? "", type.Namespace ?? "", type.Name);
 	}
 }
