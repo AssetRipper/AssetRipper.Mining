@@ -1,11 +1,24 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AssetRipper.Mining.PredefinedAssets;
 
-public readonly record struct EngineResourceData(Dictionary<long, Object> DefaultResources, Dictionary<long, Object> ExtraResources)
+public readonly record struct EngineResourceData
 {
-	public EngineResourceData() : this(new(), new())
+	public Dictionary<long, Object> DefaultResources { get; }
+	public Dictionary<long, Object> ExtraResources { get; }
+
+	public EngineResourceData()
 	{
+		DefaultResources = new();
+		ExtraResources = new();
+	}
+
+	[JsonConstructor]
+	public EngineResourceData(Dictionary<long, Object>? defaultResources, Dictionary<long, Object>? extraResources)
+	{
+		DefaultResources = defaultResources ?? new();
+		ExtraResources = extraResources ?? new();
 	}
 
 	public readonly string ToJson()
@@ -15,6 +28,8 @@ public readonly record struct EngineResourceData(Dictionary<long, Object> Defaul
 
 	public static EngineResourceData FromJson(string text)
 	{
-		return JsonSerializer.Deserialize(text, MiningSerializerContext.Default.EngineResourceData);
+		return string.IsNullOrEmpty(text)
+			? new()
+			: JsonSerializer.Deserialize(text, MiningSerializerContext.Default.EngineResourceData);
 	}
 }
