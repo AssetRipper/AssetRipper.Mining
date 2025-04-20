@@ -10,7 +10,7 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<Authors>ds5678</Authors>
 		<Company>AssetRipper</Company>
-		<Version>1.3.2</Version>
+		<Version>1.5.0</Version>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<PackageId>AssetRipper.Mining.PredefinedAssets</PackageId>
 		<PackageTags>C# Unity</PackageTags>
@@ -18,7 +18,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryType>git</RepositoryType>
 		<PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
-		<Copyright>Copyright (c) 2023 - 2024 ds5678</Copyright>
+		<Copyright>Copyright (c) 2023 - 2025 ds5678</Copyright>
 		<Description>Library for storing datamined asset information.</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
