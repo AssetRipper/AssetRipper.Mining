@@ -45,12 +45,20 @@ public readonly record struct AssemblyData(IReadOnlyList<string> Mono2, IReadOnl
 
 	static IReadOnlyList<string> GetAssemblies_Mono2(string root)
 	{
-		return GetAssemblies(root, "Editor/Data/Mono/lib/mono/2.0", "Editor/Data/Frameworks/Mono.framework");
+		return GetAssemblies(root,
+			"Editor/Data/Mono/lib/mono/unity",
+			"Editor/Data/Mono/lib/mono/2.0",
+			"Editor/Data/Frameworks/Mono.framework");
 	}
 
 	static IReadOnlyList<string> GetAssemblies_Mono4(string root)
 	{
-		return GetAssemblies(root, "Editor/Data/MonoBleedingEdge/lib/mono/4.5", "Editor/Data/MonoBleedingEdge/lib/mono/4.0");
+		return GetAssemblies(root,
+			"Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32",
+			"Editor/Data/MonoBleedingEdge/lib/mono/unityjit",
+			"Editor/Data/MonoBleedingEdge/lib/mono/unity",
+			"Editor/Data/MonoBleedingEdge/lib/mono/4.5",
+			"Editor/Data/MonoBleedingEdge/lib/mono/4.0");
 	}
 
 	static IReadOnlyList<string> GetAssemblies_Unity(string root)
@@ -76,7 +84,13 @@ public readonly record struct AssemblyData(IReadOnlyList<string> Mono2, IReadOnl
 			string path = Path.Combine(root, relativePath);
 			if (Directory.Exists(path))
 			{
-				return GetManagedAssemblies(path).ToList();
+				List<string> result = GetManagedAssemblies(path).ToList();
+				string facadeDirectory = Path.Combine(path, "Facades");
+				if (Directory.Exists(facadeDirectory))
+				{
+					result.AddRange(GetManagedAssemblies(facadeDirectory).Where(a => !result.Contains(a)));
+				}
+				return result;
 			}
 		}
 		return [];
