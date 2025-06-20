@@ -2,6 +2,8 @@
 using AngleSharp.Dom;
 using AssetRipper.Primitives;
 using System.Diagnostics;
+using System.Formats.Tar;
+using System.IO.Compression;
 
 namespace AssetRipper.Mining.AssemblyNameCollector;
 
@@ -12,7 +14,7 @@ public readonly record struct AssemblyData(IReadOnlyList<string> Mono2, IReadOnl
 		IReadOnlyList<string> mono2 = GetAssemblies_Mono2(root);
 		IReadOnlyList<string> mono4 = GetAssemblies_Mono4(root);
 		IReadOnlyList<string> unity = GetAssemblies_Unity(root);
-		IReadOnlyList<KeyValuePair<string, UnityGuid>> unityExtensions = GetUnityExtensions(root);
+		IReadOnlyList<KeyValuePair<string, UnityGuid>> unityExtensions = GetUnityExtensions(root).Concat(GetUnityPackages(root)).OrderBy(pair => pair.Key).ToList();
 		return new AssemblyData(mono2, mono4, unity, unityExtensions);
 	}
 
@@ -153,9 +155,15 @@ public readonly record struct AssemblyData(IReadOnlyList<string> Mono2, IReadOnl
 				}
 				else
 				{
+					guid = subList.FirstOrDefault(pair => pair.Item1 == name).Item2;
+					if (guid != default)
+					{
+						goto Found;
+					}
+
 					ReadOnlySpan<string> starts =
 					[
-						"Standalone/", // Preferred over empty
+						"Standalone/", // Preferred over Editor/
 						"Runtime/", // Preferred over RuntimeEditor/
 
 						// NUnit
@@ -181,20 +189,82 @@ public readonly record struct AssemblyData(IReadOnlyList<string> Mono2, IReadOnl
 			return finalList;
 		}
 		return [];
+	}
 
-		static bool TryParseGuid(string guidString, out UnityGuid guid)
+	static IReadOnlyList<KeyValuePair<string, UnityGuid>> GetUnityPackages(string root)
+	{
+		// Unity 2017.2 introduced packages, which are stored in a compressed format.
+
+		if (root.EndsWith("2017.4.34f1", StringComparison.Ordinal))
 		{
-			// Todo: implement a proper solution upstream
-			try
+			// Unity 2017.4.34f1 uses a weird compression format for packages.
+			// It's the only version that does this, so we redirect to the subsequent version.
+			return GetUnityPackages(Path.Combine(Path.GetDirectoryName(root) ?? string.Empty, "2017.4.35f1"));
+		}
+		else if (!Path.GetFileName(root).StartsWith("2017.", StringComparison.Ordinal))
+		{
+			// Unity 2018.1 introduced the Package Manager UI, which makes package references no longer automatic.
+			return [];
+		}
+
+		string directory = Path.Combine(root, "Editor/Data/Resources/PackageManager/Editor");
+		if (!Directory.Exists(directory))
+		{
+			return [];
+		}
+
+		List<KeyValuePair<string, UnityGuid>> assemblyGuids = [];
+
+		foreach (string file in Directory.EnumerateFiles(directory, "*.tgz"))
+		{
+			using FileStream fileStream = File.OpenRead(file);
+			using GZipStream gzipStream = new(fileStream, CompressionMode.Decompress);
+
+			MemoryStream tarStream = new();
+			gzipStream.CopyTo(tarStream);
+			tarStream.Position = 0;
+
+			using TarReader reader = new(tarStream);
+			TarEntry? entry;
+			while ((entry = reader.GetNextEntry()) is not null)
 			{
-				guid = UnityGuid.Parse(guidString);
-				return true;
+				string? entryPath = entry.Name;
+				if (string.IsNullOrEmpty(entryPath) || !entryPath.EndsWith(".dll.meta", StringComparison.Ordinal))
+				{
+					continue;
+				}
+
+				string assemblyName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(entryPath)); // Remove .meta and .dll
+
+				string text = new StreamReader(entry.DataStream!).ReadToEnd();
+
+				string? guidString = text.Split('\n')
+					.FirstOrDefault(line => line.StartsWith("guid: ", StringComparison.Ordinal))?
+					.Substring("guid: ".Length)
+					.Trim();
+
+				if (!string.IsNullOrEmpty(guidString) && TryParseGuid(guidString, out UnityGuid guid))
+				{
+					assemblyGuids.Add(new KeyValuePair<string, UnityGuid>(assemblyName, guid));
+				}
 			}
-			catch
-			{
-				guid = default;
-				return false;
-			}
+		}
+
+		return assemblyGuids;
+	}
+
+	private static bool TryParseGuid(string guidString, out UnityGuid guid)
+	{
+		// Todo: implement a proper solution upstream
+		try
+		{
+			guid = UnityGuid.Parse(guidString);
+			return true;
+		}
+		catch
+		{
+			guid = default;
+			return false;
 		}
 	}
 }
